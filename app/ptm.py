@@ -1,4 +1,6 @@
+import os
 import click
+from app.utils.workspace import in_python_project
 
 
 @click.group()
@@ -8,7 +10,14 @@ def ptm() -> None:
 
 @click.command()
 def init() -> None:
-    pass
+    current_dir = os.getcwd()
+    is_python_project = in_python_project(current_dir)
+
+    if is_python_project:
+        click.echo("✅ Verfied Python project.")
+    else:
+        click.echo("❌ Please call pytestmate from within a Python project.")
+    return
 
 
 @click.command()
