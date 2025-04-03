@@ -1,5 +1,5 @@
 """
-Utility functions use in intermediary steps
+Utility functions used in intermediary steps
 to cli commands.
 """
 
