@@ -3,7 +3,8 @@ Utility functions used in intermediary steps
 to cli commands.
 """
 
-from typing import Optional, List
+import os
+from typing import Optional, List, Set
 
 
 def in_python_project(root_dir: str) -> bool:
@@ -16,7 +17,29 @@ def in_python_project(root_dir: str) -> bool:
     Returns:
         bool: True if python project, else false
     """
-    return True if root_dir == "later" else False
+    key_files: Set[str] = {
+        "pyproject.toml",
+        "setup.py",
+        "requirements.txt",
+        "Pipfile",
+        "tox.ini",
+        "poetry.lock",
+        "uv.lock",
+        ".python-version",
+    }
+    key_dirs: Set[str] = {"venv", ".venv", "env"}
+
+    if any(os.path.isfile(os.path.join(root_dir, file)) for file in key_files):
+        return True
+
+    if any(os.path.isdir(os.path.join(root_dir, directory)) for directory in key_dirs):
+        return True
+
+    for _, _, files in os.walk(root_dir):
+        if any(file.endswith(".py") for file in files):
+            return True
+
+    return False
 
 
 def get_python_files(root_dir: str) -> Optional[List[str]]:
