@@ -4,7 +4,7 @@ to cli commands.
 """
 
 import os
-from typing import Optional, List, Set
+from typing import Final, Optional, List, Set
 
 
 def in_python_project(root_dir: str) -> bool:
@@ -17,7 +17,7 @@ def in_python_project(root_dir: str) -> bool:
     Returns:
         bool: True if python project, else false
     """
-    key_files: Set[str] = {
+    key_files: Final[Set[str]] = {
         "pyproject.toml",
         "setup.py",
         "requirements.txt",
@@ -27,7 +27,7 @@ def in_python_project(root_dir: str) -> bool:
         "uv.lock",
         ".python-version",
     }
-    key_dirs: Set[str] = {"venv", ".venv", "env"}
+    key_dirs: Final[Set[str]] = {"venv", ".venv", "env"}
 
     if any(os.path.isfile(os.path.join(root_dir, file)) for file in key_files):
         return True
