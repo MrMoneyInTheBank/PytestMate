@@ -53,6 +53,11 @@ def get_python_files(root_dir: str) -> Optional[List[str]]:
         list[str] | None: Relative paths of all python files, except tests
     Raises:
         NotFoundError: If a file is not found or a path is broken
-
     """
-    return [root_dir]
+    python_files: Final[List[str]] = []
+    for root, _, files in os.walk(root_dir):
+        for file in files:
+            if file.endswith(".py"):
+                python_files.append(os.path.relpath(os.path.join(root, file), root_dir))
+
+    return python_files
