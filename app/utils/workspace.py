@@ -64,3 +64,26 @@ def get_python_files(root_dir: str) -> List[str]:
                 python_files.append(os.path.relpath(os.path.join(root, file), root_dir))
 
     return python_files
+
+
+def create_tests_directory(root_dir: str) -> None:
+    """
+    Creates a tests directory in the root directory if it doesn't exist.
+
+    Parameters:
+        root_dir (str): Root directory of the project
+    Returns:
+        None
+    Raises:
+        NotFoundError: If the root directory is not found
+        PermissionError: If the root directory is not writable
+        OSError: If the root directory is not a directory
+    """
+    if not os.path.exists(root_dir):
+        raise FileNotFoundError(f"Directory {root_dir} not found")
+    if not os.access(root_dir, os.W_OK):
+        raise PermissionError(f"Directory {root_dir} is not writable")
+    if not os.path.isdir(root_dir):
+        raise FileNotFoundError(f"Directory {root_dir} not found")
+
+    os.makedirs(os.path.join(root_dir, "tests"), exist_ok=True)
