@@ -2,7 +2,11 @@ import os
 import tempfile
 from typing import Any, Generator, List
 import pytest
-from app.utils.workspace import in_python_project, get_python_files
+from app.utils.workspace import (
+    in_python_project,
+    get_python_files,
+    create_tests_directory,
+)
 
 
 @pytest.fixture
@@ -88,3 +92,11 @@ def test_get_python_files(temp_dir: str) -> None:
     )
 
     assert sorted(result) == expected
+
+
+# Tests for get_python_files function
+def test_create_tests_directory(temp_dir: str) -> None:
+    """Test create_tests_directory"""
+
+    create_tests_directory(temp_dir)
+    assert os.path.isdir(os.path.join(temp_dir, "tests"))
