@@ -54,6 +54,9 @@ def get_python_files(root_dir: str) -> List[str]:
     Raises:
         NotFoundError: If a file is not found or a path is broken
     """
+    if not os.path.isdir(root_dir):
+        raise FileNotFoundError(f"Directory {root_dir} not found")
+
     python_files: Final[List[str]] = []
     for root, _, files in os.walk(root_dir):
         for file in files:
