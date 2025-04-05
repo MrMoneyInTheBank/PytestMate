@@ -1,6 +1,6 @@
 import os
 import tempfile
-from typing import Any, Generator
+from typing import Any, Generator, List
 import pytest
 from app.utils.workspace import in_python_project, get_python_files
 
@@ -39,7 +39,7 @@ def test_virtualenv(temp_dir: str) -> None:
 
 def test_python_package(temp_dir: str) -> None:
     """Test with a pacakge"""
-    package_dir = os.path.join(temp_dir, "dummy_package")
+    package_dir: str = os.path.join(temp_dir, "dummy_package")
     os.mkdir(package_dir)
 
     with open(os.path.join(package_dir, "__init__.py"), "w") as file:
@@ -58,26 +58,26 @@ def test_no_python_project(temp_dir: str) -> None:
 
 def test_get_python_files(temp_dir: str) -> None:
     """Test get_python_files with nested Python files."""
-    package_dir = os.path.join(temp_dir, "dummy_package")
+    package_dir: str = os.path.join(temp_dir, "dummy_package")
     os.makedirs(package_dir)
 
     for name in ["file1.py", "file2.py", "file3.py"]:
         with open(os.path.join(package_dir, name), "w") as f:
             f.write("# dummy")
 
-    sub1 = os.path.join(package_dir, "subpackage1")
+    sub1: str = os.path.join(package_dir, "subpackage1")
     os.makedirs(sub1)
     with open(os.path.join(sub1, "file4.py"), "w") as f:
         f.write("# dummy")
 
-    sub2 = os.path.join(sub1, "subpackage2")
+    sub2: str = os.path.join(sub1, "subpackage2")
     os.makedirs(sub2)
     with open(os.path.join(sub2, "file5.py"), "w") as f:
         f.write("# dummy")
 
-    result = get_python_files(package_dir)
+    result: List[str] = get_python_files(package_dir)
 
-    expected = sorted(
+    expected: List[str] = sorted(
         [
             "file1.py",
             "file2.py",
