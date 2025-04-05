@@ -2,7 +2,7 @@ import os
 import tempfile
 from typing import Any, Generator
 import pytest
-from app.utils.workspace import in_python_project
+from app.utils.workspace import in_python_project, get_python_files
 
 
 @pytest.fixture
@@ -10,6 +10,9 @@ def temp_dir() -> Generator[str, Any, None]:
     """Creates a temporary directory for testing"""
     with tempfile.TemporaryDirectory() as temp:
         yield temp
+
+
+# Tests for in_python_project function
 
 
 def test_pyproject_toml(temp_dir: str) -> None:
@@ -48,3 +51,40 @@ def test_python_package(temp_dir: str) -> None:
 def test_no_python_project(temp_dir: str) -> None:
     """Test with an empty directory"""
     assert not in_python_project(temp_dir)
+
+
+# Tests for get_python_files function
+
+
+def test_get_python_files(temp_dir: str) -> None:
+    """Test get_python_files with nested Python files."""
+    package_dir = os.path.join(temp_dir, "dummy_package")
+    os.makedirs(package_dir)
+
+    for name in ["file1.py", "file2.py", "file3.py"]:
+        with open(os.path.join(package_dir, name), "w") as f:
+            f.write("# dummy")
+
+    sub1 = os.path.join(package_dir, "subpackage1")
+    os.makedirs(sub1)
+    with open(os.path.join(sub1, "file4.py"), "w") as f:
+        f.write("# dummy")
+
+    sub2 = os.path.join(sub1, "subpackage2")
+    os.makedirs(sub2)
+    with open(os.path.join(sub2, "file5.py"), "w") as f:
+        f.write("# dummy")
+
+    result = get_python_files(package_dir)
+
+    expected = sorted(
+        [
+            "file1.py",
+            "file2.py",
+            "file3.py",
+            os.path.join("subpackage1", "file4.py"),
+            os.path.join("subpackage1", "subpackage2", "file5.py"),
+        ]
+    )
+
+    assert sorted(result) == expected

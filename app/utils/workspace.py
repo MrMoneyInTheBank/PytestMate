@@ -4,7 +4,7 @@ to cli commands.
 """
 
 import os
-from typing import Final, Optional, List, Set
+from typing import Final, List, Set
 
 
 def in_python_project(root_dir: str) -> bool:
@@ -42,7 +42,7 @@ def in_python_project(root_dir: str) -> bool:
     return False
 
 
-def get_python_files(root_dir: str) -> Optional[List[str]]:
+def get_python_files(root_dir: str) -> List[str]:
     """
     Returns the relative path of all Python files in a project
     relative to the root directory.
