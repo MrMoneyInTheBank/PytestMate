@@ -94,7 +94,7 @@ def test_get_python_files(temp_dir: str) -> None:
     assert sorted(result) == expected
 
 
-# Tests for get_python_files function
+# Tests for create_tests_directory function
 def test_create_tests_directory(temp_dir: str) -> None:
     """Test create_tests_directory"""
 
