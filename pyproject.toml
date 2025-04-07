@@ -6,6 +6,7 @@ readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
     "click>=8.1.8",
+    "pathspec>=0.12.1",
     "pytest>=8.3.5",
 ]
 
@@ -16,3 +17,6 @@ dev = [
 
 [tool.pytest.ini_options]
 pythonpath = ["."]
+
+[tool.setuptools.package-data]
+"app.templates" = ["python.gitignore"]
