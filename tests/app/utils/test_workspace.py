@@ -91,6 +91,15 @@ def test_get_python_files_with_git(temp_dir: str):
     create_file(os.path.join(temp_dir, "helper.py"))
     create_file(os.path.join(temp_dir, ".gitignore"), "*.md\n")
 
+    subprocess.run(
+        ["git", "config", "user.email", "test@example.com"], cwd=temp_dir, check=True
+    )
+    subprocess.run(
+        ["git", "config", "user.name", "Test User"], cwd=temp_dir, check=True
+    )
+    subprocess.run(["git", "add", "."], cwd=temp_dir, check=True)
+    subprocess.run(["git", "commit", "-m", "init"], cwd=temp_dir, check=True)
+
     files = get_python_files(temp_dir, use_git=True)
     assert sorted(files) == ["helper.py", "main.py"]
 
