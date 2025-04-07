@@ -1,6 +1,7 @@
 import os
 import click
-from app.utils.workspace import in_python_project
+from typing import List
+from app.utils.workspace import in_python_project, get_python_files
 
 
 @click.group()
@@ -9,7 +10,17 @@ def ptm() -> None:
 
 
 @click.command()
-def init() -> None:
+@click.option(
+    "-g",
+    "--git",
+    type=bool,
+    is_flag=True,
+    flag_value=True,
+    default=False,
+    required=False,
+    help="Use git for tracking relevant python files.",
+)
+def init(git: bool) -> None:
     """
     Verify that the command is run within a Python project.
 
@@ -31,6 +42,15 @@ def init() -> None:
         click.echo("✅ Verfied Python project.")
     else:
         click.echo("❌ Please call pytestmate from within a Python project.")
+
+    python_files: List[str] = get_python_files(current_dir, git)
+    if git:
+        click.echo("Using git as a context manager")
+    else:
+        click.echo("Not using git as a context manager")
+
+    for file in python_files:
+        click.echo(file)
     return
 
 
