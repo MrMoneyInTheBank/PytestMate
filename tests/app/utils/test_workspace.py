@@ -1,9 +1,14 @@
 import os
+import shutil
+import subprocess
 import tempfile
-from typing import Any, Generator, List
+from typing import Any, Generator, List, NoReturn
 import pytest
+from _pytest.monkeypatch import MonkeyPatch
+from pathspec import PathSpec
 from app.utils.workspace import (
     in_python_project,
+    get_ignore_spec,
     get_python_files,
     create_tests_directory,
 )
@@ -11,7 +16,7 @@ from app.utils.workspace import (
 
 @pytest.fixture
 def temp_dir() -> Generator[str, Any, None]:
-    """Creates a temporary directory for testing"""
+    """Creates a temporary directory for testing."""
     with tempfile.TemporaryDirectory() as temp:
         yield temp
 
@@ -20,7 +25,7 @@ def temp_dir() -> Generator[str, Any, None]:
 
 
 def test_pyproject_toml(temp_dir: str) -> None:
-    """Test with pyproject.toml file"""
+    """Test with pyproject.toml file."""
     with open(os.path.join(temp_dir, "pyproject.toml"), "w") as file:
         file.write('[project]\nname = "dummy"')
 
@@ -28,7 +33,7 @@ def test_pyproject_toml(temp_dir: str) -> None:
 
 
 def test_setup_py(temp_dir: str) -> None:
-    """Test with pyproject.toml file"""
+    """Test with pyproject.toml file."""
     with open(os.path.join(temp_dir, "setup.py"), "w") as file:
         file.write("from setuptools import setup\nsetup(name='test_project')")
 
@@ -36,13 +41,13 @@ def test_setup_py(temp_dir: str) -> None:
 
 
 def test_virtualenv(temp_dir: str) -> None:
-    """Test with a virtual environment"""
+    """Test with a virtual environment."""
     os.mkdir(os.path.join(temp_dir, "venv"))
     assert in_python_project(temp_dir)
 
 
 def test_python_package(temp_dir: str) -> None:
-    """Test with a pacakge"""
+    """Test with a pacakge."""
     package_dir: str = os.path.join(temp_dir, "dummy_package")
     os.mkdir(package_dir)
 
@@ -53,46 +58,108 @@ def test_python_package(temp_dir: str) -> None:
 
 
 def test_no_python_project(temp_dir: str) -> None:
-    """Test with an empty directory"""
+    """Test with an empty directory."""
     assert not in_python_project(temp_dir)
 
 
 # Tests for get_python_files function
 
 
-def test_get_python_files(temp_dir: str) -> None:
-    """Test get_python_files with nested Python files."""
-    package_dir: str = os.path.join(temp_dir, "dummy_package")
-    os.makedirs(package_dir)
+def create_file(path: str, content: str = "") -> None:
+    """Helper function to create a file and write to it."""
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    with open(path, "w") as file:
+        file.write(content)
 
-    for name in ["file1.py", "file2.py", "file3.py"]:
-        with open(os.path.join(package_dir, name), "w") as f:
-            f.write("# dummy")
 
-    sub1: str = os.path.join(package_dir, "subpackage1")
-    os.makedirs(sub1)
-    with open(os.path.join(sub1, "file4.py"), "w") as f:
-        f.write("# dummy")
+def test_get_python_files_no_git(temp_dir: str) -> None:
+    """Test without git awareness."""
+    create_file(os.path.join(temp_dir, "main.py"))
+    create_file(os.path.join(temp_dir, "helper.py"))
+    create_file(os.path.join(temp_dir, "README.md"))
 
-    sub2: str = os.path.join(sub1, "subpackage2")
-    os.makedirs(sub2)
-    with open(os.path.join(sub2, "file5.py"), "w") as f:
-        f.write("# dummy")
+    files: List[str] = get_python_files(temp_dir, use_git=False)
+    assert sorted(files) == ["helper.py", "main.py"]
 
-    no_git_result: List[str] = get_python_files(package_dir, use_git=False)
-    # git_result: List[str] = get_python_files(package_dir, use_git=True)
 
-    expected: List[str] = sorted(
-        [
-            "file1.py",
-            "file2.py",
-            "file3.py",
-            os.path.join("subpackage1", "file4.py"),
-            os.path.join("subpackage1", "subpackage2", "file5.py"),
-        ]
-    )
+@pytest.mark.skipif(not shutil.which("git"), reason="Git is not installed")
+def test_get_python_files_with_git(temp_dir: str):
+    """Test with git awareness."""
+    subprocess.run(["git", "init"], cwd=temp_dir, check=True)
+    create_file(os.path.join(temp_dir, "main.py"))
+    create_file(os.path.join(temp_dir, "helper.py"))
+    create_file(os.path.join(temp_dir, ".gitignore"), "*.md\n")
 
-    assert sorted(no_git_result) == expected
+    subprocess.run(["git", "add", "."], cwd=temp_dir, check=True)
+    subprocess.run(["git", "commit", "-m", "init"], cwd=temp_dir, check=True)
+
+    files = get_python_files(temp_dir, use_git=True)
+    assert sorted(files) == ["helper.py", "main.py"]
+
+
+def test_get_python_files_not_a_directory():
+    """Test if root_dir is not found."""
+    with pytest.raises(FileNotFoundError):
+        get_python_files("not/a/real/path", use_git=False)
+
+
+@pytest.mark.skipif(not shutil.which("git"), reason="Git is not installed")
+def test_get_python_files_git_not_installed(monkeypatch: MonkeyPatch, temp_dir: str):
+    """Test if git not installed on system with -g flag."""
+    monkeypatch.setattr(shutil, "which", lambda _: None)
+    subprocess.run(["git", "init"], cwd=temp_dir, check=True)
+    create_file(os.path.join(temp_dir, ".gitignore"), "*.md\n")
+
+    with pytest.raises(RuntimeError, match="Git is not installed"):
+        get_python_files(temp_dir, use_git=True)
+
+
+def test_get_python_files_missing_git_dir(temp_dir: str):
+    """Test if git aware but not inside git repo."""
+    create_file(os.path.join(temp_dir, ".gitignore"), "*.md\n")
+    with pytest.raises(ModuleNotFoundError, match="not a git repo"):
+        get_python_files(temp_dir, use_git=True)
+
+
+@pytest.mark.skipif(not shutil.which("git"), reason="Git is not installed")
+def test_get_python_files_missing_gitignore(temp_dir: str):
+    """Test if git aware but gitignore doesn't exist."""
+    subprocess.run(["git", "init"], cwd=temp_dir, check=True)
+    with pytest.raises(FileNotFoundError, match="does not have a gitignore"):
+        get_python_files(temp_dir, use_git=True)
+
+
+@pytest.mark.skipif(not shutil.which("git"), reason="Git is not installed")
+def test_get_python_files_subprocess_error(monkeypatch: MonkeyPatch, temp_dir: str):
+    """Test for subprocess error in git aware case."""
+    subprocess.run(["git", "init"], cwd=temp_dir, check=True)
+    create_file(os.path.join(temp_dir, ".gitignore"), "*.md\n")
+
+    def mock_check_output(*_args: Any, **_kwargs: Any) -> NoReturn:
+        _ = _kwargs
+        _ = _args
+        raise subprocess.CalledProcessError(1, "git")
+
+    monkeypatch.setattr(subprocess, "check_output", mock_check_output)
+
+    with pytest.raises(RuntimeError, match="Could not filter files using git"):
+        get_python_files(temp_dir, use_git=True)
+
+
+def test_get_ignore_spec_uses_gitignore(temp_dir: str):
+    """Test gitignore pathspec."""
+    create_file(os.path.join(temp_dir, ".gitignore"), "*.py\n")
+    spec = get_ignore_spec(temp_dir)
+    assert isinstance(spec, PathSpec)
+    assert spec.match_file("main.py") is True
+
+
+def test_get_ignore_spec_uses_template(temp_dir: str):
+    """Test default pathspec."""
+    spec = get_ignore_spec(temp_dir)
+    assert isinstance(spec, PathSpec)
+    assert spec.match_file("__pycache__/foo.pyc")
+    assert not spec.match_file("main.py")
 
 
 # Tests for create_tests_directory function
@@ -101,3 +168,30 @@ def test_create_tests_directory(temp_dir: str) -> None:
 
     create_tests_directory(temp_dir)
     assert os.path.isdir(os.path.join(temp_dir, "tests"))
+
+
+def test_root_dir_does_not_exist(monkeypatch: MonkeyPatch):
+    """Test if root_dir does not exist."""
+    monkeypatch.setattr(os.path, "exists", lambda _: False)
+
+    with pytest.raises(FileNotFoundError, match="not found"):
+        create_tests_directory("/fake/path")
+
+
+def test_root_dir_not_writable(monkeypatch: MonkeyPatch):
+    """Test if root_dir is not writeable."""
+    monkeypatch.setattr(os.path, "exists", lambda _: True)
+    monkeypatch.setattr(os, "access", lambda *_: False)
+
+    with pytest.raises(PermissionError, match="not writable"):
+        create_tests_directory("/fake/path")
+
+
+def test_root_dir_not_a_directory(monkeypatch: MonkeyPatch):
+    """Test if root_dir is not a directory"""
+    monkeypatch.setattr(os.path, "exists", lambda _: True)
+    monkeypatch.setattr(os, "access", lambda *_: True)
+    monkeypatch.setattr(os.path, "isdir", lambda _: False)
+
+    with pytest.raises(FileNotFoundError, match="not found"):
+        create_tests_directory("/fake/path")
