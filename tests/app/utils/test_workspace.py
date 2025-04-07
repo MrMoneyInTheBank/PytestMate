@@ -11,6 +11,7 @@ from app.utils.workspace import (
     get_ignore_spec,
     get_python_files,
     create_tests_directory,
+    create_test_files,
 )
 
 
@@ -163,6 +164,8 @@ def test_get_ignore_spec_uses_template(temp_dir: str):
 
 
 # Tests for create_tests_directory function
+
+
 def test_create_tests_directory(temp_dir: str) -> None:
     """Test create_tests_directory"""
 
@@ -195,3 +198,50 @@ def test_root_dir_not_a_directory(monkeypatch: MonkeyPatch):
 
     with pytest.raises(FileNotFoundError, match="not found"):
         create_tests_directory("/fake/path")
+
+
+# Tests for create_test_files function
+
+
+def test_tests_dir_not_exist(temp_dir: str) -> None:
+    """Test if tests directory does not exist."""
+    with pytest.raises(FileNotFoundError, match="not found"):
+        create_test_files(os.path.join(temp_dir, "tests"), [])
+
+
+def test_tests_dir_not_writable(monkeypatch: MonkeyPatch) -> None:
+    """Test if tests directory is not writable."""
+    monkeypatch.setattr(os.path, "exists", lambda _: True)
+    monkeypatch.setattr(os, "access", lambda *_: False)
+
+    with pytest.raises(PermissionError, match="not writable"):
+        create_test_files("tests/", [])
+
+
+def test_create_test_files(temp_dir: str) -> None:
+    """Test if test files were created correctly."""
+    create_file(os.path.join(temp_dir, "main.py"))
+    create_file(os.path.join(temp_dir, "helper.py"))
+    create_file(os.path.join(temp_dir, "app/another_helper.py"))
+    create_file(os.path.join(temp_dir, "__init__.py"))
+
+    create_tests_directory(temp_dir)
+    create_test_files(
+        os.path.join(temp_dir, "tests"),
+        ["main.py", "helper.py", "app/another_helper.py"],
+    )
+
+    created_test_files: List[str] = []
+    for root, _, files in os.walk(os.path.join(temp_dir, "tests")):
+        for file in files:
+            relpath = os.path.relpath(os.path.join(root, file), temp_dir)
+            created_test_files.append(relpath)
+
+    expected_files = sorted(
+        [
+            "tests/test_main.py",
+            "tests/test_helper.py",
+            "tests/app/test_another_helper.py",
+        ]
+    )
+    assert sorted(created_test_files) == expected_files
