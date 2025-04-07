@@ -145,6 +145,32 @@ wheels = [
 ]
 
 [[package]]
+name = "pytest-emoji"
+version = "0.2.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "pytest" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/88/4d/d489f939f0717a034cea7955d36bc2a7a5ba1b263871e63ad8cb16d47555/pytest-emoji-0.2.0.tar.gz", hash = "sha256:e1bd4790d87649c2d09c272c88bdfc4d37c1cc7c7a46583087d7c510944571e8", size = 6171 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/f7/51/80af966c0aded877da7577d21c4601ca98c6f603c6e6073ddea071af01ec/pytest_emoji-0.2.0-py3-none-any.whl", hash = "sha256:6e34ed21970fa4b80a56ad11417456bd873eb066c02315fe9df0fafe6d4d4436", size = 5664 },
+]
+
+[[package]]
+name = "pytest-sugar"
+version = "1.0.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "packaging" },
+    { name = "pytest" },
+    { name = "termcolor" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/f5/ac/5754f5edd6d508bc6493bc37d74b928f102a5fff82d9a80347e180998f08/pytest-sugar-1.0.0.tar.gz", hash = "sha256:6422e83258f5b0c04ce7c632176c7732cab5fdb909cb39cca5c9139f81276c0a", size = 14992 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/92/fb/889f1b69da2f13691de09a111c16c4766a433382d44aa0ecf221deded44a/pytest_sugar-1.0.0-py3-none-any.whl", hash = "sha256:70ebcd8fc5795dc457ff8b69d266a4e2e8a74ae0c3edc749381c64b5246c8dfd", size = 10171 },
+]
+
+[[package]]
 name = "pytestmate"
 version = "0.1.0"
 source = { virtual = "." }
@@ -157,6 +183,8 @@ dependencies = [
 [package.dev-dependencies]
 dev = [
     { name = "pre-commit" },
+    { name = "pytest-emoji" },
+    { name = "pytest-sugar" },
 ]
 
 [package.metadata]
@@ -167,7 +195,11 @@ requires-dist = [
 ]
 
 [package.metadata.requires-dev]
-dev = [{ name = "pre-commit", specifier = ">=4.2.0" }]
+dev = [
+    { name = "pre-commit", specifier = ">=4.2.0" },
+    { name = "pytest-emoji", specifier = ">=0.2.0" },
+    { name = "pytest-sugar", specifier = ">=1.0.0" },
+]
 
 [[package]]
 name = "pyyaml"
@@ -184,6 +216,15 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/fe/0f/25911a9f080464c59fab9027482f822b86bf0608957a5fcc6eaac85aa515/PyYAML-6.0.2-cp313-cp313-musllinux_1_1_x86_64.whl", hash = "sha256:68ccc6023a3400877818152ad9a1033e3db8625d899c72eacb5a668902e4d652", size = 751597 },
     { url = "https://files.pythonhosted.org/packages/14/0d/e2c3b43bbce3cf6bd97c840b46088a3031085179e596d4929729d8d68270/PyYAML-6.0.2-cp313-cp313-win32.whl", hash = "sha256:bc2fa7c6b47d6bc618dd7fb02ef6fdedb1090ec036abab80d4681424b84c1183", size = 140527 },
     { url = "https://files.pythonhosted.org/packages/fa/de/02b54f42487e3d3c6efb3f89428677074ca7bf43aae402517bc7cca949f3/PyYAML-6.0.2-cp313-cp313-win_amd64.whl", hash = "sha256:8388ee1976c416731879ac16da0aff3f63b286ffdd57cdeb95f3f2e085687563", size = 156446 },
+]
+
+[[package]]
+name = "termcolor"
+version = "3.0.1"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/f8/b6/8e2aaa8aeb570b5cc955cd913b083d96c5447bbe27eaf330dfd7cc8e3329/termcolor-3.0.1.tar.gz", hash = "sha256:a6abd5c6e1284cea2934443ba806e70e5ec8fd2449021be55c280f8a3731b611", size = 12935 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/a6/7e/a574ccd49ad07e8b117407bac361f1e096b01f1b620365daf60ff702c936/termcolor-3.0.1-py3-none-any.whl", hash = "sha256:da1ed4ec8a5dc5b2e17476d859febdb3cccb612be1c36e64511a6f2485c10c69", size = 7157 },
 ]
 
 [[package]]
