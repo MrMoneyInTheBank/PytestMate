@@ -79,7 +79,8 @@ def test_get_python_files(temp_dir: str) -> None:
     with open(os.path.join(sub2, "file5.py"), "w") as f:
         f.write("# dummy")
 
-    result: List[str] = get_python_files(package_dir)
+    no_git_result: List[str] = get_python_files(package_dir, use_git=False)
+    # git_result: List[str] = get_python_files(package_dir, use_git=True)
 
     expected: List[str] = sorted(
         [
@@ -91,7 +92,7 @@ def test_get_python_files(temp_dir: str) -> None:
         ]
     )
 
-    assert sorted(result) == expected
+    assert sorted(no_git_result) == expected
 
 
 # Tests for create_tests_directory function
