@@ -144,3 +144,44 @@ def create_tests_directory(root_dir: str) -> None:
         raise FileNotFoundError(f"Directory {root_dir} not found")
 
     os.makedirs(os.path.join(root_dir, "tests"), exist_ok=True)
+
+
+def create_test_files(tests_dir: str, python_files: List[str]) -> None:
+    """
+    Creates test files in the tests directory mirroring the structure
+    of the provided Python files. Each Python file will have a corresponding
+    test file in the tests directory with the same relative path structure.
+
+    Parameters:
+        tests_dir (str): Path to the tests directory
+        python_files (List[str]): List of relative paths to Python files from project root
+    Returns:
+        None
+    Raises:
+        FileNotFoundError: If the tests directory is not found
+        PermissionError: If the tests directory is not writable
+    """
+    if not os.path.exists(tests_dir):
+        raise FileNotFoundError(f"Directory {tests_dir} not found")
+    if not os.access(tests_dir, os.W_OK):
+        raise PermissionError(f"Directory {tests_dir} is not writable")
+
+    for python_file in python_files:
+        test_file = python_file
+        if test_file == "__init__.py":
+            continue
+        if test_file.startswith("test_"):
+            continue
+
+        if not test_file.startswith("test_"):
+            dirname = os.path.dirname(test_file)
+            basename = os.path.basename(test_file)
+            test_file = os.path.join(dirname, f"test_{basename}")
+
+        test_dir = os.path.dirname(os.path.join(tests_dir, test_file))
+        os.makedirs(test_dir, exist_ok=True)
+
+        test_file_path = os.path.join(tests_dir, test_file)
+        if not os.path.exists(test_file_path):
+            with open(test_file_path, "w") as f:
+                f.write("import pytest\n\n")
