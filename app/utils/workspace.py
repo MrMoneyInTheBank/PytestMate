@@ -143,7 +143,8 @@ def create_tests_directory(root_dir: str) -> None:
     if not os.path.isdir(root_dir):
         raise FileNotFoundError(f"Directory {root_dir} not found")
 
-    os.makedirs(os.path.join(root_dir, "tests"), exist_ok=True)
+    test_dir = os.path.join(root_dir, "tests")
+    os.makedirs(test_dir, exist_ok=True)
 
 
 def create_test_files(tests_dir: str, python_files: List[str]) -> None:
