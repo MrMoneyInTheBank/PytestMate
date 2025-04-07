@@ -1,7 +1,12 @@
 import os
 import click
 from typing import List
-from app.utils.workspace import in_python_project, get_python_files
+from app.utils.workspace import (
+    in_python_project,
+    get_python_files,
+    create_tests_directory,
+    create_test_files,
+)
 
 
 @click.group()
@@ -42,35 +47,48 @@ def init(git: bool) -> None:
         click.echo("✅ Verfied Python project.")
     else:
         click.echo("❌ Please call pytestmate from within a Python project.")
+        return
 
+    click.echo("Found these python files")
     python_files: List[str] = get_python_files(current_dir, git)
-    if git:
-        click.echo("Using git as a context manager")
-    else:
-        click.echo("Not using git as a context manager")
 
-    for file in python_files:
-        click.echo(file)
+    if len(python_files) > 15:
+        click.echo(f"Found {len(python_files)} relevant files.")
+    else:
+        for file in python_files:
+            click.echo(file)
+
+    click.echo()
+
+    if click.confirm("Looks good?"):
+        create_tests_directory(current_dir)
+        create_test_files("tests", python_files)
+    else:
+        click.echo("Cleaning up.")
     return
 
 
 @click.command()
 def update() -> None:
+    """Coming Soon."""
     pass
 
 
 @click.command()
 def test() -> None:
+    """Coming Soon."""
     pass
 
 
 @click.command()
 def report() -> None:
+    """Coming Soon."""
     pass
 
 
 @click.command()
 def generate() -> None:
+    """Coming Soon."""
     pass
 
 
