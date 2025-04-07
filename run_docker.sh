@@ -1,26 +1,32 @@
 #!/bin/zsh
-
 set -e  # Exit on errors
-set -x  # Print commands
 
-# Resolve the full path to the directory this script is in
-SCRIPT_DIR="${0:A:h}"
-PROJECT_DIR="${SCRIPT_DIR}"
-
+# Constants
+IMAGE_NAME="ptm"
 CONTAINER_NAME="ptm_test_container"
 
-# Step 1: Start container in detached mode
-docker run -dit --name "$CONTAINER_NAME" python:3.13-slim bash
+# Check if the image exists
+if ! docker image inspect $IMAGE_NAME &> /dev/null; then
+  echo "Image '$IMAGE_NAME' not found. Building now..."
+  docker build -t $IMAGE_NAME .
+  echo "Image built successfully."
+else
+  echo "Image '$IMAGE_NAME' already exists."
+fi
 
-# Step 2: Install dependencies inside the container
-docker exec "$CONTAINER_NAME" apt-get update
-docker exec "$CONTAINER_NAME" apt-get install -y git build-essential
-
-# Step 3: Copy your project into the container
-docker cp "$PROJECT_DIR" "$CONTAINER_NAME":/root/pytestmate
-
-# Step 4: Install your project (with pip)
-docker exec "$CONTAINER_NAME" bash -c "cd /root/pytestmate && pip install ."
-
-# Step 5: Drop into interactive shell
-docker exec -it "$CONTAINER_NAME" bash
+# Check if a container with this name already exists
+if docker ps -a --format '{{.Names}}' | grep -q "^${CONTAINER_NAME}$"; then
+  echo "Container '$CONTAINER_NAME' already exists."
+  
+  # Check if it's running
+  if docker ps --format '{{.Names}}' | grep -q "^${CONTAINER_NAME}$"; then
+    echo "Container is already running. Attaching to it..."
+    docker attach $CONTAINER_NAME
+  else
+    echo "Container exists but is not running. Starting and attaching to it..."
+    docker start -i $CONTAINER_NAME
+  fi
+else
+  echo "Creating and starting new container '$CONTAINER_NAME'..."
+  docker run -it --name $CONTAINER_NAME $IMAGE_NAME
+fi
