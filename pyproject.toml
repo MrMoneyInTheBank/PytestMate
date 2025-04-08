@@ -1,6 +1,6 @@
 [project]
 name = "pytestmate"
-version = "0.1.0"
+version = "0.1.1"
 description = "Generate Pytests for your project through the terminal."
 readme = "README.md"
 requires-python = ">=3.11"
