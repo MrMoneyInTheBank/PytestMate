@@ -19,7 +19,7 @@ Python test infrastructure across your project.
 import os
 import click
 from typing import List
-from app.utils.workspace import (
+from app import (
     in_python_project,
     get_python_files,
     create_tests_directory,
@@ -45,45 +45,53 @@ def ptm() -> None:
 )
 def init(git: bool) -> None:
     """
-    Verify that the command is run within a Python project.
+    Initialize test structure for a Python project.
 
-    This command checks whether the current working directory is a valid Python project.
-    If the verification succeeds, it prints a confirmation message. Otherwise, it prompts
-    the user to run the command inside a Python project.
+    This command:
+    1. Verifies the current directory is a Python project
+    2. Identifies Python source files
+    3. Creates test directory structure
+    4. Generates test file placeholders
 
-    Future Enhancements:
-    - Scaffold a test directory structure.
-    - Generate test file placeholders based on existing source code.
+    Parameters:
+        git (bool): Whether to use git for file discovery
 
     Returns:
         None
+
+    Raises:
+        click.ClickException: If project validation fails or file operations fail
     """
-    current_dir = os.getcwd()
-    is_python_project = in_python_project(current_dir)
+    try:
+        current_dir: str = os.getcwd()
+        if not in_python_project(current_dir):
+            raise click.ClickException(
+                "Please run pytestmate from within a Python project"
+            )
 
-    if is_python_project:
-        click.echo("✅ Verfied Python project.")
-    else:
-        click.echo("❌ Please call pytestmate from within a Python project.")
-        return
+        click.echo("✅ Verified Python project")
 
-    click.echo("Found these python files")
-    python_files: List[str] = get_python_files(current_dir, git)
+        python_files: List[str] = get_python_files(current_dir, git)
+        if not python_files:
+            raise click.ClickException("No Python files found in the project")
 
-    if len(python_files) > 15:
-        click.echo(f"Found {len(python_files)} relevant files.")
-    else:
-        for file in python_files:
-            click.echo(file)
+        # Display files or count
+        if len(python_files) > 15:
+            click.echo(f"Found {len(python_files)} Python files")
+        else:
+            click.echo("Found these Python files:")
+            for file in python_files:
+                click.echo(f"  {file}")
 
-    click.echo()
+        if click.confirm("Create test structure?"):
+            create_tests_directory(current_dir)
+            create_test_files("tests", python_files)
+            click.echo("✅ Test structure created successfully")
+        else:
+            click.echo("Operation cancelled")
 
-    if click.confirm("Looks good?"):
-        create_tests_directory(current_dir)
-        create_test_files("tests", python_files)
-    else:
-        click.echo("Cleaning up.")
-    return
+    except (FileNotFoundError, PermissionError) as e:
+        raise click.ClickException(str(e))
 
 
 @click.command()
