@@ -1,3 +1,21 @@
+"""
+PytestMate CLI Interface
+
+This module provides the command-line interface for PytestMate, a tool for managing
+Python test infrastructure. It offers commands for initializing test structures,
+updating test files, running tests, and generating test reports.
+
+Available Commands:
+    init    - Initialize test structure for a Python project
+    update  - Update existing test files (Coming Soon)
+    test    - Run tests with pytest (Coming Soon)
+    report  - Generate test coverage reports (Coming Soon)
+    generate - Generate additional test files (Coming Soon)
+
+The CLI is built using Click and provides a user-friendly interface for managing
+Python test infrastructure across your project.
+"""
+
 import os
 import click
 from typing import List
