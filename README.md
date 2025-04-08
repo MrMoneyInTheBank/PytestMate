@@ -3,7 +3,7 @@
 [![PyPI version](https://badge.fury.io/py/pytestmate.svg)](https://badge.fury.io/py/pytestmate)
 [![Python Versions](https://img.shields.io/pypi/pyversions/pytestmate.svg)](https://pypi.org/project/pytestmate/)
 [![License](https://img.shields.io/github/license/MrMoneyInTheBank/pytestmate.svg)](https://github.com/MrMoneyInTheBank/pytestmate/blob/main/LICENSE)
-[![Tests](https://github.com/MrMoneyInTheBank/pytestmate/actions/workflows/ci.yml/badge.svg)](https://github.com/MrMoneyInTheBank/pytestmate/actions/workflows/ci.yml)
+[![Tests](https://github.com/MrMoneyInTheBank/pytestmate/actions/workflows/ci.yaml/badge.svg)](https://github.com/MrMoneyInTheBank/pytestmate/actions/workflows/ci.yaml)
 
 A command-line tool for managing Python test infrastructure. PytestMate helps you set up, maintain, and run tests for your Python projects with minimal effort.
 
