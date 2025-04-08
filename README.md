@@ -1,7 +1,6 @@
 # PytestMate
 
-[![PyPI version](https://badge.fury.io/py/pytestmate.svg)](https://badge.fury.io/py/pytestmate)
-[![Python Versions](https://img.shields.io/pypi/pyversions/pytestmate.svg)](https://pypi.org/project/pytestmate/)
+[![PyPI version](https://img.shields.io/pypi/v/pytestmate.svg)](https://pypi.org/project/pytestmate/)
 [![License](https://img.shields.io/github/license/MrMoneyInTheBank/pytestmate.svg)](https://github.com/MrMoneyInTheBank/pytestmate/blob/main/LICENSE)
 [![Tests](https://github.com/MrMoneyInTheBank/pytestmate/actions/workflows/ci.yaml/badge.svg)](https://github.com/MrMoneyInTheBank/pytestmate/actions/workflows/ci.yaml)
 
