@@ -1,6 +1,16 @@
 """
-Utility functions used in intermediary steps
-to cli commands.
+Workspace management utilities for Python projects.
+
+This module provides a set of utility functions for managing Python project workspaces,
+with a particular focus on test file management and project structure. Key features include:
+
+- Project structure validation (Python project detection)
+- File filtering and management using git or .gitignore patterns
+- Test directory and test file creation and management
+- Workspace path handling and validation
+
+The module is designed to support automated test file generation and management
+while respecting project structure and git configurations.
 """
 
 import os
