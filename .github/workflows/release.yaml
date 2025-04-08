@@ -8,6 +8,7 @@ jobs:
   build-and-publish:
     name: Build and Publish pytestmate using uv
     runs-on: ubuntu-latest
+    environment: release
 
     permissions:
       id-token: write
