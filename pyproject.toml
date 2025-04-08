@@ -3,7 +3,7 @@ name = "pytestmate"
 version = "0.1.0"
 description = "Generate Pytests for your project through the terminal."
 readme = "README.md"
-requires-python = ">=3.13"
+requires-python = ">=3.11"
 dependencies = [
     "click>=8.1.8",
     "pathspec>=0.12.1",
@@ -26,3 +26,6 @@ pythonpath = ["."]
 [tool.setuptools.package-data]
 "app.templates" = ["python.gitignore"]
 
+[build-system]
+requires = ["setuptools>=68.0"]
+build-backend = "setuptools.build_meta"
